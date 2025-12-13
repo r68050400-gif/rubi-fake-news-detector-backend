@@ -1,7 +1,5 @@
 flask
-tensorflow==2.15.0
-tf-keras
-transformers
-torch
+scikit-learn
+joblib
 numpy
 
