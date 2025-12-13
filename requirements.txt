@@ -1,5 +1,7 @@
 flask
-tensorflow
+tensorflow==2.15.0
+tf-keras
 transformers
 torch
 numpy
+
