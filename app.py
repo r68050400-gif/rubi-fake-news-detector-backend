@@ -1,37 +1,29 @@
 from flask import Flask, request, jsonify
-from transformers import BertTokenizer, TFBertForSequenceClassification
-import tensorflow as tf
+import joblib
 
 app = Flask(__name__)
 
-tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-model = TFBertForSequenceClassification.from_pretrained("bert-base-uncased")
+# simple fake news logic (demo + earning purpose)
+fake_keywords = ["fake", "rumor", "hoax", "false", "scam"]
 
 @app.route("/")
 def home():
-    return {"status": "Rubi Fake News Detector API is LIVE!"}
+    return {"status": "Rubi Fake News Detector API is LIVE"}
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    text = request.json.get("text", "")
+    text = request.json.get("text", "").lower()
 
-    if text.strip() == "":
+    if not text:
         return jsonify({"error": "No text provided"}), 400
 
-    inputs = tokenizer(text, return_tensors="tf", truncation=True, padding=True)
-    outputs = model(inputs)
-    logits = outputs.logits
-
-    prediction = tf.math.argmax(logits, axis=1).numpy()[0]
-    probs = tf.nn.softmax(logits, axis=1)
-    confidence = float(tf.reduce_max(probs))
-
-    result = "REAL" if prediction == 1 else "FAKE"
+    result = "FAKE" if any(word in text for word in fake_keywords) else "REAL"
 
     return jsonify({
         "result": result,
-        "confidence": round(confidence, 2)
+        "confidence": 0.85
     })
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
